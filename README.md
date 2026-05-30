@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/header.svg" alt="deepagent-vscode" width="100%">
+</p>
+
 # deepagent-vscode
 
 Chat with your own **LangGraph / deepagents** agent from inside VS Code — in the
