@@ -1,0 +1,49 @@
+{
+  "name": "deepagent-vscode",
+  "displayName": "Deep Agent",
+  "description": "Chat with your LangGraph / deepagents agent from VS Code, alongside Copilot.",
+  "version": "0.1.0",
+  "publisher": "dkedar7",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": ["AI", "Chat", "Other"],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "deepagent.agent",
+        "name": "deepagent",
+        "fullName": "Deep Agent",
+        "description": "Run your LangGraph/deepagents agent",
+        "isSticky": true
+      }
+    ],
+    "configuration": {
+      "title": "Deep Agent",
+      "properties": {
+        "deepagent.agentSpec": {
+          "type": "string",
+          "default": "",
+          "description": "Agent spec 'path/to/agent.py:graph' or 'module:graph' to run."
+        },
+        "deepagent.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Python interpreter used to launch the deepagent-vscode sidecar (must have deepagent-vscode installed)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.95.0",
+    "typescript": "^5.4.0"
+  }
+}

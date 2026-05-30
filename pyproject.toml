@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "deepagent-vscode"
+version = "0.1.0"
+description = "Python stdio sidecar bridging LangGraph/deepagents agents to the deepagent-vscode chat extension"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    {name = "Kedar Dabhadkar"}
+]
+keywords = ["langgraph", "deepagents", "vscode", "agents", "ai"]
+dependencies = [
+    "langgraph-stream-parser>=0.2,<0.3",
+]
+
+[project.optional-dependencies]
+demo = [
+    "deepagents>=0.3",
+]
+dev = [
+    "pytest>=8",
+    "langgraph>=1.1.0",
+    "langchain-core>=1.4.0",
+]
+
+[project.scripts]
+deepagent-vscode-sidecar = "deepagent_vscode.sidecar:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["deepagent_vscode"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
