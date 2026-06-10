@@ -2,7 +2,7 @@
   "name": "deepagent-vscode",
   "displayName": "Deep Agent",
   "description": "Chat with your LangGraph / deepagents agent from VS Code, alongside Copilot.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "dkedar7",
   "engines": {
     "vscode": "^1.95.0"
