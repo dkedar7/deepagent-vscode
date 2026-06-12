@@ -1,11 +1,18 @@
-"""deepagent-vscode — Python stdio sidecar for the VS Code chat extension.
+"""Deprecated alias package: ``deepagent_vscode`` is now ``langstage_vscode``.
 
-The extension spawns ``python -m deepagent_vscode`` (or the
-``deepagent-vscode-sidecar`` console script); the sidecar bridges a
-LangGraph/deepagents agent to the chat participant over newline-delimited JSON.
+Kept for one transition window so existing imports and spawn commands keep
+working. Import / spawn ``langstage_vscode`` instead.
 """
-from .sidecar import main, run
+import sys as _sys
+import warnings as _warnings
 
-__version__ = "0.1.0"
+from langstage_vscode import sidecar  # noqa: F401
 
-__all__ = ["main", "run", "__version__"]
+_warnings.warn(
+    "deepagent_vscode has been renamed to langstage_vscode; "
+    "this alias package will be removed in a future release.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
+_sys.modules[__name__ + ".sidecar"] = sidecar

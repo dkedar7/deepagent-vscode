@@ -6,7 +6,7 @@ from typing import Any
 
 from langchain_core.messages import AIMessage, ToolMessage
 
-from deepagent_vscode.sidecar import main, run
+from langstage_vscode.sidecar import main, run
 
 
 # ── Fakes / fixtures ─────────────────────────────────────────────────
@@ -122,17 +122,17 @@ def test_invalid_json_reported():
 
 def _isolate_config(monkeypatch, tmp_path):
     """Point cwd + the global config home at an empty tmp dir and strip
-    DEEPAGENT_* env so main() resolves from pure defaults."""
+    legacy + canonical env so main() resolves from pure defaults."""
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("DEEPAGENTS_CONFIG_HOME", str(tmp_path))
-    for var in ("DEEPAGENT_AGENT_SPEC", "DEEPAGENT_WORKSPACE_ROOT"):
+    monkeypatch.setenv("LANGSTAGE_CONFIG_HOME", str(tmp_path))
+    for var in ("LANGSTAGE_AGENT_SPEC", "DEEPAGENT_AGENT_SPEC", "LANGSTAGE_WORKSPACE_ROOT", "DEEPAGENT_WORKSPACE_ROOT"):
         monkeypatch.delenv(var, raising=False)
 
 
 def test_main_show_config(monkeypatch, tmp_path, capsys):
     _isolate_config(monkeypatch, tmp_path)
     assert main(["--show-config"]) == 0
-    assert "DEEPAGENT_AGENT_SPEC" in capsys.readouterr().out
+    assert "LANGSTAGE_AGENT_SPEC" in capsys.readouterr().out
 
 
 def test_main_no_spec_emits_error(monkeypatch, tmp_path, capsys):
@@ -140,7 +140,7 @@ def test_main_no_spec_emits_error(monkeypatch, tmp_path, capsys):
     assert main([]) == 1
     err = json.loads(capsys.readouterr().out.strip())
     assert err["type"] == "error"
-    assert "deepagents.toml" in err["error"]
+    assert "langstage.toml" in err["error"]
 
 
 def test_main_demo_conflicts_with_agent(monkeypatch, tmp_path, capsys):
@@ -151,8 +151,22 @@ def test_main_demo_conflicts_with_agent(monkeypatch, tmp_path, capsys):
 
 
 def test_main_toml_supplies_agent_spec(monkeypatch, tmp_path, capsys):
-    """The deepagents.toml resolver is actually wired in: [agent].spec from a
+    """The langstage.toml resolver is actually wired in: [agent].spec from a
     project file reaches load_agent_spec with no flags or env."""
+    _isolate_config(monkeypatch, tmp_path)
+    (tmp_path / "langstage.toml").write_text(
+        '[agent]\nspec = "langgraph_stream_parser.demo.stub:graph"\n'
+    )
+    monkeypatch.setattr(
+        "sys.stdin", io.StringIO(json.dumps({"type": "shutdown"}) + "\n")
+    )
+    assert main([]) == 0
+    events = [json.loads(line) for line in capsys.readouterr().out.splitlines() if line.strip()]
+    assert events[0] == {"type": "ready"}
+
+
+def test_main_legacy_toml_still_works(monkeypatch, tmp_path, capsys):
+    """Pre-rename deepagents.toml keeps resolving as a deprecated fallback."""
     _isolate_config(monkeypatch, tmp_path)
     (tmp_path / "deepagents.toml").write_text(
         '[agent]\nspec = "langgraph_stream_parser.demo.stub:graph"\n'
@@ -163,6 +177,21 @@ def test_main_toml_supplies_agent_spec(monkeypatch, tmp_path, capsys):
     assert main([]) == 0
     events = [json.loads(line) for line in capsys.readouterr().out.splitlines() if line.strip()]
     assert events[0] == {"type": "ready"}
+
+
+def test_legacy_module_import_warns():
+    import sys
+
+    import pytest as _pytest
+
+    sys.modules.pop("deepagent_vscode", None)
+    sys.modules.pop("deepagent_vscode.sidecar", None)
+    with _pytest.warns(DeprecationWarning, match="langstage_vscode"):
+        import deepagent_vscode  # noqa: F401
+    import deepagent_vscode.sidecar as old_sidecar
+    import langstage_vscode.sidecar as new_sidecar
+
+    assert old_sidecar is new_sidecar
 
 
 def test_main_demo_end_to_end(monkeypatch, tmp_path, capsys):

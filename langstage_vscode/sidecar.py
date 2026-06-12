@@ -1,4 +1,4 @@
-"""stdio sidecar bridging a LangGraph agent to the deepagent-vscode extension.
+"""stdio sidecar bridging a LangGraph agent to the langstage-vscode extension.
 
 Reads newline-delimited JSON commands on stdin, runs the agent through
 ``langgraph-stream-parser``, and writes newline-delimited JSON events on
@@ -125,17 +125,17 @@ def main(argv: list[str] | None = None) -> int:
 
     from langgraph_stream_parser.host import HostConfig
 
-    parser = argparse.ArgumentParser(prog="deepagent-vscode-sidecar")
+    parser = argparse.ArgumentParser(prog="langstage-vscode-sidecar")
     parser.add_argument(
         "--agent",
         default=None,
         help="Agent spec 'path.py:var' or 'module:var' "
-        "(overrides DEEPAGENT_AGENT_SPEC / deepagents.toml [agent].spec).",
+        "(overrides LANGSTAGE_AGENT_SPEC / langstage.toml [agent].spec).",
     )
     parser.add_argument(
         "--workspace",
         default=None,
-        help="Workspace root (overrides DEEPAGENT_WORKSPACE_ROOT / deepagents.toml).",
+        help="Workspace root (overrides LANGSTAGE_WORKSPACE_ROOT / langstage.toml).",
     )
     parser.add_argument(
         "--demo",
@@ -145,12 +145,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--show-config",
         action="store_true",
-        help="Print the resolved configuration (defaults < deepagents.toml < env < CLI) and exit.",
+        help="Print the resolved configuration (defaults < langstage.toml < env < CLI) and exit.",
     )
     args = parser.parse_args(argv)
 
     # Same resolution chain as every other deep-agent surface:
-    # defaults < deepagents.toml < DEEPAGENT_* env < CLI flags.
+    # defaults < langstage.toml < LANGSTAGE_* env < CLI flags.
     cfg = HostConfig.resolve(
         overrides={"agent_spec": args.agent, "workspace_root": args.workspace}
     )
@@ -171,11 +171,11 @@ def main(argv: list[str] | None = None) -> int:
         spec = DEMO_AGENT_SPEC
     if not spec:
         return fail(
-            "no agent spec (pass --agent or --demo, set DEEPAGENT_AGENT_SPEC, "
-            "or set [agent].spec in deepagents.toml)"
+            "no agent spec (pass --agent or --demo, set LANGSTAGE_AGENT_SPEC, "
+            "or set [agent].spec in langstage.toml)"
         )
 
-    os.environ.setdefault("DEEPAGENT_WORKSPACE_ROOT", str(cfg.workspace_root))
+    os.environ.setdefault("LANGSTAGE_WORKSPACE_ROOT", str(cfg.workspace_root))
     try:
         graph = load_agent_spec(spec)
     except Exception as exc:  # noqa: BLE001

@@ -1,8 +1,8 @@
 {
-  "name": "deepagent-vscode",
-  "displayName": "Deep Agent",
-  "description": "Chat with your LangGraph / deepagents agent from VS Code, alongside Copilot.",
-  "version": "0.2.0",
+  "name": "langstage-vscode",
+  "displayName": "LangStage",
+  "description": "Chat with your LangGraph agent from VS Code, alongside Copilot — the VS Code stage of the LangStage family.",
+  "version": "0.3.0",
   "publisher": "dkedar7",
   "engines": {
     "vscode": "^1.95.0"
@@ -13,25 +13,37 @@
   "contributes": {
     "chatParticipants": [
       {
-        "id": "deepagent.agent",
-        "name": "deepagent",
-        "fullName": "Deep Agent",
-        "description": "Run your LangGraph/deepagents agent",
+        "id": "langstage.agent",
+        "name": "langstage",
+        "fullName": "LangStage",
+        "description": "Run your LangGraph agent",
         "isSticky": true
       }
     ],
     "configuration": {
-      "title": "Deep Agent",
+      "title": "LangStage",
       "properties": {
+        "langstage.agentSpec": {
+          "type": "string",
+          "default": "",
+          "description": "Agent spec 'path/to/agent.py:graph' or 'module:graph' to run. Leave empty to fall back to LANGSTAGE_AGENT_SPEC or the project's langstage.toml. (Legacy deepagent.agentSpec is still read as a fallback.)"
+        },
+        "langstage.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Python interpreter used to launch the langstage-vscode sidecar (must have langstage-vscode installed)."
+        },
         "deepagent.agentSpec": {
           "type": "string",
           "default": "",
-          "description": "Agent spec 'path/to/agent.py:graph' or 'module:graph' to run. Leave empty to fall back to DEEPAGENT_AGENT_SPEC or the project's deepagents.toml."
+          "description": "DEPRECATED — use langstage.agentSpec.",
+          "deprecationMessage": "Renamed to langstage.agentSpec."
         },
         "deepagent.pythonPath": {
           "type": "string",
-          "default": "python",
-          "description": "Python interpreter used to launch the deepagent-vscode sidecar (must have deepagent-vscode installed)."
+          "default": "",
+          "description": "DEPRECATED — use langstage.pythonPath.",
+          "deprecationMessage": "Renamed to langstage.pythonPath."
         }
       }
     }

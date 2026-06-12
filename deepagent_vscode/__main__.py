@@ -1,3 +1,5 @@
-from .sidecar import main
+"""Deprecated alias for ``python -m langstage_vscode``."""
+from langstage_vscode.sidecar import main
 
-raise SystemExit(main())
+if __name__ == "__main__":
+    raise SystemExit(main())

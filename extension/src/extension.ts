@@ -11,7 +11,7 @@ import * as readline from 'readline';
  * wire vocabulary — which the dispatcher below maps onto the chat response.
  */
 export function activate(context: vscode.ExtensionContext) {
-  const participant = vscode.chat.createChatParticipant('deepagent.agent', handler);
+  const participant = vscode.chat.createChatParticipant('langstage.agent', handler);
   participant.iconPath = new vscode.ThemeIcon('robot');
   context.subscriptions.push(participant);
 }
@@ -29,26 +29,35 @@ async function handler(
   stream: vscode.ChatResponseStream,
   token: vscode.CancellationToken,
 ): Promise<void> {
-  const config = vscode.workspace.getConfiguration('deepagent');
-  const agentSpec = config.get<string>('agentSpec') ?? '';
-  const python = config.get<string>('pythonPath') || 'python';
+  const config = vscode.workspace.getConfiguration('langstage');
+  const legacy = vscode.workspace.getConfiguration('deepagent');
+  const agentSpec =
+    config.get<string>('agentSpec') || legacy.get<string>('agentSpec') || '';
+  const python =
+    config.get<string>('pythonPath') || legacy.get<string>('pythonPath') || 'python';
 
   const workspace =
     vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? process.cwd();
 
   // When the setting is empty, spawn without --agent and let the sidecar
-  // resolve the family-standard chain (deepagents.toml < DEEPAGENT_* env).
-  // If nothing resolves anywhere, the sidecar emits a clean `error` event
-  // that the dispatcher renders in the chat.
-  const args = ['-m', 'deepagent_vscode', '--workspace', workspace];
+  // resolve the family-standard chain (langstage.toml < LANGSTAGE_* env,
+  // with the legacy deepagents vocabulary as fallback). If nothing resolves
+  // anywhere, the sidecar emits a clean `error` event that the dispatcher
+  // renders in the chat.
+  const args = ['-m', 'langstage_vscode', '--workspace', workspace];
   if (agentSpec) {
     args.push('--agent', agentSpec);
   }
 
   const proc = spawn(python, args, {
-    // cwd anchors the sidecar's deepagents.toml walk-up at the workspace.
+    // cwd anchors the sidecar's langstage.toml walk-up at the workspace.
     cwd: workspace,
-    env: { ...process.env, DEEPAGENT_WORKSPACE_ROOT: workspace },
+    env: {
+      ...process.env,
+      LANGSTAGE_WORKSPACE_ROOT: workspace,
+      // Older sidecar versions read the legacy name.
+      DEEPAGENT_WORKSPACE_ROOT: workspace,
+    },
   });
 
   token.onCancellationRequested(() => proc.kill());
