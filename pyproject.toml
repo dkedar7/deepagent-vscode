@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langstage-vscode"
-version = "0.3.0"
+version = "0.4.0"
 description = "Python stdio sidecar bridging LangGraph agents to the LangStage VS Code chat extension"
 license = "MIT"
 requires-python = ">=3.11"
@@ -13,10 +13,13 @@ authors = [
 ]
 keywords = ["langgraph", "langchain", "langstage", "vscode", "agents", "ai"]
 dependencies = [
-    "langgraph-stream-parser>=0.3,<0.4",
+    "langgraph-stream-parser>=0.3,<0.5",
 ]
 
 [project.optional-dependencies]
+agui = [
+    "langgraph-stream-parser[agui]>=0.4,<0.5",
+]
 demo = [
     "deepagents>=0.3",
 ]
