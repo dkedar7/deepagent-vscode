@@ -52,6 +52,17 @@ langstage-vscode is the VS Code stage of the **LangStage family**: write your ag
 
 📖 **Full documentation:** <https://dkedar7.github.io/langstage-docs/>
 
+### Serve over AG-UI
+
+This surface's agent — any LangGraph `CompiledGraph` — can also be served over the
+[AG-UI protocol](https://github.com/dkedar7/langgraph-stream-parser) without changing
+your agent code:
+
+```bash
+pip install "langgraph-stream-parser[agui]"
+langstage-agui --agent my_agent.py:graph
+```
+
 ## Install
 
 ### Sidecar (Python)
